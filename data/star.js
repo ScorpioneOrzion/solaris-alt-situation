@@ -1,12 +1,12 @@
 export default class Star {
   /**
-   * 
    * @param {number} angle 
    * @param {number} distance 
    * @param {string} name
    * @param {Star} star
+   * @param {number} resources
    */
-  constructor(angle, distance, name, star) {
+  constructor(angle, distance, name, star, resources) {
     this.angle = angle
     this.distance = distance
     this.name = name
@@ -21,5 +21,10 @@ export default class Star {
   /** @type {number} */
   get y() {
     return Math.sin(this.angle) * this.distance + (this.star.y ?? 0)
+  }
+
+  /** @param {Star} star */
+  distanceTo(star) {
+    return Math.sqrt(Math.pow((this.x - star.x), 2) + Math.pow((this.y - star.y), 2))
   }
 }
