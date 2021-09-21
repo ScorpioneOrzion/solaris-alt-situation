@@ -5,8 +5,8 @@ const starCount = 60
 const playerCount = 2
 const tau = 2.0 * Math.PI;
 
-function generateLocations() {
-  /** @type {{angle:number, distance:number, linked:boolean}[]} */
+export function generateLocations() {
+  /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean, linkedLocations:Array}[]} */
   let locations = [];
   let seed = Number((Math.random() * 1e8).toFixed(0))
   const rng = Lehmner32(seed)
@@ -20,7 +20,7 @@ function generateLocations() {
     let createdLocations = false;
 
     for (let i = 0; i < maxTries; i++) {
-      /** @type {{angle:number, distance:number, linked:boolean}[]} */
+      /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean}[]} */
       let candidateLocations = [];
       let baseLocation = generateStarPositionInSector(currentRadius, rng)
       let locationRejected = false;
@@ -32,6 +32,8 @@ function generateLocations() {
           locationRejected = true;
           break;
         }
+
+        candidateLocations.push(location)
       }
 
       if (locationRejected) { continue; }
@@ -45,14 +47,41 @@ function generateLocations() {
       currentRadius += radiusStep;
   } while (locations.length < starCount);
 
+
   const distanceFromCenter = getGalaxyDiameter(locations).x / 4;
   let playerAngle = sectorAngle / 2;
-  let disiredLocation = { distance: distanceFromCenter, angle: playerAngle }
+  let desiredLocation = { distance: distanceFromCenter, angle: playerAngle }
+  let firstHomeLocation = getClosestLocation(desiredLocation, locations)
+  let firstHomeLocationIndex = locations.indexOf(firstHomeLocation)
+
+  for (let i = 0; i < playerCount; i++) {
+    let locationIndex = firstHomeLocationIndex + i
+    locations[locationIndex].homeStar = true;
+  }
+
+  let homeLocations = locations.filter(location => location.homeStar)
+  let startingStarsCount = 4
+
+  for (let homeLocation of homeLocations) {
+    homeLocation.linkedLocations = []
+  }
+
+  let unlinkedLocations = locations.filter(location => !location.homeStar)
+  while (startingStarsCount--) {
+    for (let homeLocation of homeLocations) {
+      let closestUnlinkedLocation = getClosestLocation(homeLocation, unlinkedLocations)
+      homeLocation.linkedLocations.push(closestUnlinkedLocation)
+      closestUnlinkedLocation.linked = true
+      unlinkedLocations = unlinkedLocations.filter(location => location !== closestUnlinkedLocation)
+    }
+  }
+
+  return locations
 }
 
 function generateStarPositionInSector(currentRadius, rng) {
-  let angle = rng.random() * (tau / playerCount);
-  let distance = currentRadius / 2.0 + rng.next().value * (currentRadius * 2.0);
+  let angle = rng.next().value * (tau / playerCount) % tau;
+  let distance = currentRadius / 2.0 + (rng.next().value % 1) * (currentRadius * 2.0);
 
   return {
     angle, distance, linked: false
@@ -81,4 +110,16 @@ function getGalaxyDiameter(locations) {
     x: maxX - minX,
     y: maxY - minY
   };
+}
+
+function getClosestLocations(location, locations, amount) {
+  let ls = new Star(location.angle, location.distance)
+  return locations.sort((a, b) => {
+    let la = new Star(a.angle, a.distance), lb = new Star(b.angle, b.distance)
+    return ls.distanceTo(la) - ls.distanceTo(lb)
+  }).slice(0, amount);
+}
+
+function getClosestLocation(location, locations) {
+  return getClosestLocations(location, locations, 1)[0]
 }

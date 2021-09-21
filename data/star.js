@@ -15,12 +15,12 @@ export default class Star {
 
   /** @type {number} */
   get x() {
-    return Math.cos(this.angle) * this.distance + (this.star.x ?? 0)
+    return Math.cos(this.angle) * this.distance + (this.star?.x ?? 0)
   }
 
   /** @type {number} */
   get y() {
-    return Math.sin(this.angle) * this.distance + (this.star.y ?? 0)
+    return Math.sin(this.angle) * this.distance + (this.star?.y ?? 0)
   }
 
   /** @param {Star} star */
