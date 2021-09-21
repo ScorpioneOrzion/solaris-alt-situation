@@ -1,15 +1,12 @@
 import Star from "./star.js";
 import { Lehmner32 } from "./lehmner32.js";
 
-const starCount = 60
-const playerCount = 2
-const tau = 2.0 * Math.PI;
-
-export function generateLocations() {
+export function generateLocations(starCount, playerCount) {
   /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean, linkedLocations:Array}[]} */
   let locations = [];
   let seed = Number((Math.random() * 1e8).toFixed(0))
   const rng = Lehmner32(seed)
+  const tau = 2.0 * Math.PI;
 
   let currentRadius = 50;
   let radiusStep = 50;
@@ -22,7 +19,7 @@ export function generateLocations() {
     for (let i = 0; i < maxTries; i++) {
       /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean}[]} */
       let candidateLocations = [];
-      let baseLocation = generateStarPositionInSector(currentRadius, rng)
+      let baseLocation = generateStarPositionInSector(currentRadius, playerCount, rng)
       let locationRejected = false;
 
       for (let sectorIndex = 0; sectorIndex < playerCount; sectorIndex++) {
@@ -79,7 +76,8 @@ export function generateLocations() {
   return locations
 }
 
-function generateStarPositionInSector(currentRadius, rng) {
+function generateStarPositionInSector(currentRadius, playerCount, rng) {
+  const tau = 2.0 * Math.PI;
   let angle = rng.next().value * (tau / playerCount) % tau;
   let distance = currentRadius / 2.0 + (rng.next().value % 1) * (currentRadius * 2.0);
 
