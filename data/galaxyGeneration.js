@@ -1,8 +1,8 @@
 import Star from "./star.js";
 import { Lehmner32 } from "./lehmner32.js";
 
-export function generateLocations(starCount, playerCount) {
-  /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean, linkedLocations:Array}[]} */
+export function generateLocations(starCount, playerCount, minResource, maxResource) {
+  /** @type {{angle:number, distance:number, linked:boolean, homeStar:boolean, resources:number, linkedLocations:Array}[]} */
   let locations = [];
   let seed = Number((Math.random() * 1e8).toFixed(0))
   const rng = Lehmner32(seed)
@@ -70,6 +70,13 @@ export function generateLocations(starCount, playerCount) {
       homeLocation.linkedLocations.push(closestUnlinkedLocation)
       closestUnlinkedLocation.linked = true
       unlinkedLocations = unlinkedLocations.filter(location => location !== closestUnlinkedLocation)
+    }
+  }
+
+  for (let location of locations) {
+    if (location.homeStar) location.resources = maxResource
+    else {
+      location.resources = minResource + Math.floor((rng.next().value % 1) * (maxResource - minResource))
     }
   }
 

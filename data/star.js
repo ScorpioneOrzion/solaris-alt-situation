@@ -6,11 +6,13 @@ export default class Star {
    * @param {Star} star
    * @param {number} resources
    */
-  constructor(angle, distance, name, star, resources) {
+  constructor(angle, distance, name, star, resources, player) {
     this.angle = angle
     this.distance = distance
     this.name = name
     this.star = star
+    this.resources = resources
+    this.player = player
   }
 
   /** @type {number} */
