@@ -57,19 +57,21 @@ export function generateLocations(starCount, playerCount, minResource, maxResour
   }
 
   let homeLocations = locations.filter(location => location.homeStar)
-  let startingStarsCount = 4
+  let startingStarsCount = starCount - 1
 
   for (let homeLocation of homeLocations) {
     homeLocation.linkedLocations = []
   }
 
   let unlinkedLocations = locations.filter(location => !location.homeStar)
-  while (startingStarsCount--) {
-    for (let homeLocation of homeLocations) {
-      let closestUnlinkedLocation = getClosestLocation(homeLocation, unlinkedLocations)
-      homeLocation.linkedLocations.push(closestUnlinkedLocation)
-      closestUnlinkedLocation.linked = true
-      unlinkedLocations = unlinkedLocations.filter(location => location !== closestUnlinkedLocation)
+  if (startingStarsCount) {
+    while (startingStarsCount--) {
+      for (let homeLocation of homeLocations) {
+        let closestUnlinkedLocation = getClosestLocation(homeLocation, unlinkedLocations)
+        homeLocation.linkedLocations.push(closestUnlinkedLocation)
+        closestUnlinkedLocation.linked = true
+        unlinkedLocations = unlinkedLocations.filter(location => location !== closestUnlinkedLocation)
+      }
     }
   }
 
