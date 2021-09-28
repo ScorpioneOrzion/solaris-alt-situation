@@ -57,7 +57,7 @@ export function generateLocations(starCount, playerCount, minResource, maxResour
   }
 
   let homeLocations = locations.filter(location => location.homeStar)
-  let startingStarsCount = starCount - 1
+  let startingStarsCount = Math.min(Math.floor(starCount / playerCount - 1), 4)
 
   for (let homeLocation of homeLocations) {
     homeLocation.linkedLocations = []
