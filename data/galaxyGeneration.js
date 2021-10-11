@@ -1,6 +1,5 @@
-import Star from "./star.js";
 
-export function generateLocations(playerCount) {
+export default function generateLocations(playerCount) {
   let layer = 1;
   let current = 0;
   const locations = [];
